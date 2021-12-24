@@ -13,3 +13,5 @@
 SELECT [ProductID],[SalesOrderID],[CustomerID],[OrderQty],[UnitPrice],[OrderDate],[TaxAmt]
 INTO SalesFact
 FROM Sales_Fact_View
+
+Select * from SalesFact
