@@ -1,0 +1,64 @@
+#we'll use several different libraries to help us visualize the dataset. To do this analysis, import the following libraries:
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
+ #Because the raw data is in a Parquet format, you can use the Spark context to pull the file into memory as a DataFrame directly. Create a Spark DataFrame by retrieving the data via the Open Datasets API. Here, we use the Spark DataFrame schema on read properties to infer the datatypes and schema.
+ 
+ from azureml.opendatasets import NycTlcYellow
+from datetime import datetime
+from dateutil import parser
+
+end_date = parser.parse('2018-06-06')
+start_date = parser.parse('2018-05-01')
+nyc_tlc = NycTlcYellow(start_date=start_date, end_date=end_date)
+df = nyc_tlc.to_spark_dataframe()
+
+#After the data is read, we'll want to do some initial filtering to clean the dataset. We might remove unneeded columns and add columns that extract important information. In addition, we'll filter out anomalies within the dataset.
+
+# Filter the dataset 
+from pyspark.sql.functions import *
+
+filtered_df = df.select('vendorID', 'passengerCount', 'tripDistance','paymentType', 'fareAmount', 'tipAmount'\
+                                , date_format('tpepPickupDateTime', 'hh').alias('hour_of_day')\
+                                , dayofweek('tpepPickupDateTime').alias('day_of_week')\
+                                , dayofmonth(col('tpepPickupDateTime')).alias('day_of_month'))\
+                            .filter((df.passengerCount > 0)\
+                                & (df.tipAmount >= 0)\
+                                & (df.fareAmount >= 1) & (df.fareAmount <= 250)\
+                                & (df.tripDistance > 0) & (df.tripDistance <= 200))
+
+filtered_df.createOrReplaceTempView("taxi_dataset")
+
+#Within your notebook, create a new cell and copy the following code. By using this query, we want to understand how the average tip amounts have changed over the period we've selected. This query will also help us identify other useful insights, including the minimum/maximum tip amount per day and the average fare amount.
+
+%%sql
+SELECT 
+    day_of_month
+    , MIN(tipAmount) AS minTipAmount
+    , MAX(tipAmount) AS maxTipAmount
+    , AVG(tipAmount) AS avgTipAmount
+    , AVG(fareAmount) as fareAmount
+FROM taxi_dataset 
+GROUP BY day_of_month
+ORDER BY day_of_month ASC
+
+#To make development easier and less expensive, we'll downsample the dataset. We'll use the built-in Apache Spark sampling capability. In addition, both Seaborn and Matplotlib require a Pandas DataFrame or NumPy array. To get a Pandas DataFrame, use the toPandas() command to convert the DataFrame.
+
+# To make development easier, faster, and less expensive, downsample for now
+sampled_taxi_df = filtered_df.sample(True, 0.001, seed=1234)
+
+# The charting package needs a Pandas DataFrame or NumPy array to do the conversion
+sampled_taxi_pd_df = sampled_taxi_df.toPandas()
+
+#We want to understand the distribution of tips in our dataset. We'll use Matplotlib to create a histogram that shows the distribution of tip amount and count. Based on the distribution, we can see that tips are skewed toward amounts less than or equal to $10.
+
+# Look at a histogram of tips by count by using Matplotlib
+
+ax1 = sampled_taxi_pd_df['tipAmount'].plot(kind='hist', bins=25, facecolor='lightblue')
+ax1.set_title('Tip amount distribution')
+ax1.set_xlabel('Tip Amount ($)')
+ax1.set_ylabel('Counts')
+plt.suptitle('')
+plt.show()
