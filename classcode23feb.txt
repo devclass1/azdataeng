@@ -1,0 +1,28 @@
+// Lab - Simple notebook
+val data = Array(1, 2, 3, 4, 5)
+
+// The parallelize method of the Spark context will create an RDD
+val dist = sc.parallelize(data)
+
+// To get the count of values in the RDD
+dist.count()
+
+// If you want to get the elements of the RDD
+dist.collect()
+#######################################################################
+// Lab - Using Data Frames
+// The DataFrame class is part of org.apache.spark.sql 
+
+// First we are using the Seq trait to create a sequence
+// In the sequence , for each collection, we have details of a course
+val data=Seq((1,"DP-203",9.99),(1,"AI-102",10.99),(1,"AZ-204",11.99))
+
+// We can then create an RDD from the sequence
+val dataRDD=sc.parallelize(data)
+
+// From the output of the RDD , you will see the data types are being automatically inferred
+
+// Then we can convert the RDD to a data frame
+val df=dataRDD.toDF()
+display(df)
+########################################################################
