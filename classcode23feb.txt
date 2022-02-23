@@ -26,3 +26,10 @@ val dataRDD=sc.parallelize(data)
 val df=dataRDD.toDF()
 display(df)
 ########################################################################
+
+val df1 = spark.read.format("csv").load("dbfs:/FileStore/shared_uploads/samplemail@mail.com/Log.csv")
+df1.show()
+display(df1)
+val df2 = spark.read.format("csv").option("header","true").load("dbfs:/FileStore/shared_uploads/samplemail@mail.com/Log.csv")
+display(df2)
+
