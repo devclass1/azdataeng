@@ -33,5 +33,11 @@ display(df1)
 val df2 = spark.read.format("csv").option("header","true").load("dbfs:/FileStore/shared_uploads/samplemail@mail.com/Log.csv")
 display(df2)
 df2.select("Operationname","Status").show()
+// Now we are asking Spark to infer the data type
+// Now the dataset will take Id as an Integer and Time as timestamp
+val df2 = spark.read.format("csv").options(Map("inferSchema"->"true","header"->"true")).load("dbfs:/FileStore/shared_uploads/samplemail@mail.com/Log.csv")
+df2.filter(df2("Status")==="Succeeded").show()
+// If you want to group by Status
+display(df2.groupBy(df2("Status")).count())
 
 
