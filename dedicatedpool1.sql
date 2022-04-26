@@ -28,7 +28,7 @@ CREATE EXTERNAL FILE FORMAT TextFileFormat WITH (
 	[Status] [varchar](100) NULL,
 	[Eventcategory] [varchar](100) NULL,
 	[Level] [varchar](100) NULL,
-	[Time] [datetime] NULL,
+	[Time] [varchar](100) NULL,
 	[Subscription] [varchar](200) NULL,
 	[Eventinitiatedby] [varchar](1000) NULL,
 	[Resourcetype] [varchar](1000) NULL,
