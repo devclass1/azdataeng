@@ -21,9 +21,23 @@ Spark RDDs are not much suitable for applications that make updates to the state
 RDD Creation
 RDD’s are created primarily in two different ways, first parallelizing an existing collection and secondly referencing a dataset in an external storage system (HDFS, S3 and many more). 
 
-
+#####################################################
 val spark:SparkSession = SparkSession.builder()
       .master("local[1]")
       .appName("sparkapp1")
       .getOrCreate()    
+######################################################
+Using sparkContext.parallelize()
+sparkContext.parallelize is used to parallelize an existing collection in your driver program. This is a basic method to create RDD and used mainly while POC’s or prototyping and it required all data to be present on the driver program prior to creating RDD hence it is not most used for production applications.
+
+######################################################
+
+//Create RDD from parallelize    
+val dataSeq = Seq(("Java", 20000), ("Python", 100000), ("Scala", 3000))   
+val rdd=spark.sparkContext.parallelize(dataSeq)
+######################################################
+
+For production applications, we mostly create RDD by using external storage systems like HDFS, S3, HBase e.t.c. To make it simple for this Spark tutorial we are using files from the local system and create RDD.
+
+####################################################
 
