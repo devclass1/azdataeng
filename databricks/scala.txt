@@ -21,3 +21,9 @@ Spark RDDs are not much suitable for applications that make updates to the state
 RDD Creation
 RDD’s are created primarily in two different ways, first parallelizing an existing collection and secondly referencing a dataset in an external storage system (HDFS, S3 and many more). 
 
+
+val spark:SparkSession = SparkSession.builder()
+      .master("local[1]")
+      .appName("sparkapp1")
+      .getOrCreate()    
+
