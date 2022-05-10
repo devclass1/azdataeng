@@ -7,3 +7,17 @@ Additionally, RDDs provide data abstraction of partitioning and distribution of 
 
 This Apache Spark RDD tutorial describes the basic operations available on RDDs, such as map,filter, and persist etc using Scala example. In addition, this tutorial also explains Pair RDD functions which operate on RDDs of key-value pairs such as groupByKey and join etc.
 
+RDD Advantages
+– In-Memory Processing
+– Immutability
+– Fault Tolerance
+– Lazy Evolution
+– Partitioning
+– Parallelize
+
+Limitations
+Spark RDDs are not much suitable for applications that make updates to the state store such as storage systems for a web application. For these applications, it is more efficient to use systems that perform traditional update logging and data checkpointing, such as databases. The goal of RDD is to provide an efficient programming model for batch analytics and leave these asynchronous applications.
+
+RDD Creation
+RDD’s are created primarily in two different ways, first parallelizing an existing collection and secondly referencing a dataset in an external storage system (HDFS, S3 and many more). 
+
