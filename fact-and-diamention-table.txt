@@ -4,14 +4,14 @@ Let’s assume we’re building a simple data warehouse for a retail store. Here
 Dimension Table: DimProduct – stores details about products.
 Fact Table: FactSales – stores sales data.
 ####################################################
--- Create the Dimension Table
+-- Create the Dimension Table with NONCLUSTERED, NOT ENFORCED PRIMARY KEY
 CREATE TABLE DimProduct (
     ProductID INT NOT NULL,
     ProductName NVARCHAR(100),
     Category NVARCHAR(50),
     SubCategory NVARCHAR(50),
     Manufacturer NVARCHAR(100),
-    PRIMARY KEY (ProductID)
+    PRIMARY KEY NONCLUSTERED (ProductID) NOT ENFORCED
 );
 
 -- Insert Sample Data into DimProduct
@@ -22,14 +22,14 @@ VALUES
     (3, 'Headphones', 'Electronics', 'Audio', 'Brand C'),
     (4, 'Office Chair', 'Furniture', 'Office Furniture', 'Brand D');
 
--- Create the Fact Table (no foreign key constraints)
+-- Create the Fact Table with NONCLUSTERED, NOT ENFORCED PRIMARY KEY
 CREATE TABLE FactSales (
     SalesID INT NOT NULL,
-    ProductID INT NOT NULL,  -- Ensure ProductID matches the entries in DimProduct
+    ProductID INT NOT NULL,  -- Should match ProductID in DimProduct for referential integrity
     SaleDate DATE,
     QuantitySold INT,
     SaleAmount DECIMAL(10, 2),
-    PRIMARY KEY (SalesID)
+    PRIMARY KEY NONCLUSTERED (SalesID) NOT ENFORCED
 );
 
 -- Insert Sample Data into FactSales
