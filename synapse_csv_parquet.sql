@@ -78,3 +78,21 @@ SELECT
     [Customer_ID],
     [Sales_Target]
 FROM MarketingSalesCsvExternal;
+
+################################
+You'll need to create a database scoped credential first if you haven't already
+#################################
+CREATE DATABASE SCOPED CREDENTIAL [BlobStorageCredential]
+WITH IDENTITY = 'SHARED ACCESS SIGNATURE',
+SECRET = '<your-SAS-token>';
+
+###############################
+Replace Placeholders:
+
+Replace <your-container-name> with your actual Azure Blob Storage container name
+
+Replace <your-storage-account-name> with your actual storage account name
+
+Replace /path/to/your/ with the actual path to your CSV file in blob storage
+
+Replace /output/path/ with your desired output path for the Parquet file
