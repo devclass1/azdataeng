@@ -1,11 +1,10 @@
--- Step 1: Create External Data Source
+-- Step 1: Create External Data Source (public blob, so no credential needed)
 CREATE EXTERNAL DATA SOURCE AzureBlobStorageLogs
 WITH (
-    TYPE = HADOOP,
     LOCATION = 'https://sbstorage3045.blob.core.windows.net/sbcontainer/input/input_ac/'
 );
 
--- Step 2: Create External File Format for Parquet
+-- Step 2: Create External File Format
 CREATE EXTERNAL FILE FORMAT ParquetFileFormat
 WITH (
     FORMAT_TYPE = PARQUET
