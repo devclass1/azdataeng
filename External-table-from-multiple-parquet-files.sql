@@ -12,15 +12,17 @@ WITH (
 
 -- Step 3: Create External Table
 CREATE EXTERNAL TABLE dbo.ActivityLogsExternal
-(
-    [resourceId] NVARCHAR(500),
-    [time] DATETIME2,
-    [operationName] NVARCHAR(200),
-    [category] NVARCHAR(200),
-    [resultType] NVARCHAR(100),
-    [level] NVARCHAR(100),
-    [properties] NVARCHAR(MAX)
-)
+[Correlationid] varchar(200),
+   [Operationname] varchar(300),
+   [Status] varchar(100),
+   [Eventcategory] varchar(100),
+   [Level] varchar(100),
+   [Time] varchar(100),
+   [Subscription] varchar(200),
+   [Eventinitiatedby] varchar(1000),
+   [Resourcetype] varchar(300),
+   [Resourcegroup] varchar(1000),
+   [Resource] varchar(2000))
 WITH (
     LOCATION = '/',
     DATA_SOURCE = AzureBlobStorageLogs,
