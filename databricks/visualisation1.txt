@@ -1,0 +1,74 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, round
+from pyspark.sql.types import *
+import numpy as np
+from datetime import datetime, timedelta
+import pandas as pd
+
+# Initialize Spark session
+spark = SparkSession.builder.appName("SalesDataGeneration").getOrCreate()
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Create synthetic sales data
+def generate_sales_data(num_rows=25):
+    # Product categories
+    categories = ['Electronics', 'Clothing', 'Home Goods', 'Books', 'Sports']
+    
+    # Regions
+    regions = ['North', 'South', 'East', 'West']
+    
+    # Sales channels
+    channels = ['Online', 'In-Store', 'Wholesale']
+    
+    # Generate dates
+    base_date = datetime(2023, 1, 1)
+    dates = [base_date + timedelta(days=np.random.randint(1, 365)) for _ in range(num_rows)]
+    
+    # Generate data as pandas DataFrame
+    data = {
+        'OrderID': [f'ORD{1000 + i}' for i in range(num_rows)],
+        'OrderDate': dates,
+        'ProductCategory': np.random.choice(categories, num_rows),
+        'Region': np.random.choice(regions, num_rows),
+        'SalesChannel': np.random.choice(channels, num_rows),
+        'UnitsSold': np.random.randint(1, 50, num_rows),
+        'UnitPrice': np.round(np.random.uniform(10, 500, num_rows), 2),
+        'CustomerAge': np.random.randint(18, 70, num_rows),
+        'DiscountApplied': np.round(np.random.uniform(0, 0.3, num_rows), 2)
+    }
+    
+    pdf = pd.DataFrame(data)
+    pdf['TotalSales'] = pdf['UnitsSold'] * pdf['UnitPrice'] * (1 - pdf['DiscountApplied'])
+    pdf['OrderDate'] = pd.to_datetime(pdf['OrderDate'])
+    
+    return pdf
+
+# Generate pandas DataFrame
+pandas_df = generate_sales_data(25)
+
+# Convert to Spark DataFrame
+sales_df = spark.createDataFrame(pandas_df)
+
+# Show the data
+display(sales_df)
+
+# Optional: Save as Delta table
+# sales_df.write.format("delta").mode("overwrite").save("/mnt/delta/sales_data")
+
+# For Databricks visualizations, you can use the display() function directly
+# Example visualizations:
+
+# 1. Sales by Category
+display(sales_df.groupBy("ProductCategory").agg({"TotalSales": "sum"}).orderBy("sum(TotalSales)"))
+
+# 2. Sales Distribution by Region
+display(sales_df.groupBy("Region").agg({"TotalSales": "avg"}).orderBy("avg(TotalSales)"))
+
+# 3. Monthly Sales Trend
+monthly_sales = sales_df.withColumn("Month", col("OrderDate").substr(1, 7))
+display(monthly_sales.groupBy("Month").agg({"TotalSales": "sum"}).orderBy("Month"))
+
+# 4. Sales Channel Distribution
+display(sales_df.groupBy("SalesChannel").agg({"TotalSales": "sum"}))
