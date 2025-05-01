@@ -1,0 +1,84 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, sum, avg, count, month, year, date_format
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Assuming sales_df is already created from previous steps
+# If not, recreate it with the code from previous examples
+
+## 1. Bar Chart - Total Sales by Product Category
+category_sales = sales_df.groupBy("ProductCategory") \
+                         .agg(sum("TotalSales").alias("TotalSales")) \
+                         .orderBy("TotalSales", ascending=False)
+
+# Convert to Pandas for visualization
+category_pd = category_sales.toPandas()
+
+plt.figure(figsize=(10,6))
+plt.bar(category_pd["ProductCategory"], category_pd["TotalSales"], color='skyblue')
+plt.title("Total Sales by Product Category")
+plt.xlabel("Product Category")
+plt.ylabel("Total Sales ($)")
+plt.xticks(rotation=45)
+plt.show()
+
+## 2. Pie Chart - Sales Channel Distribution
+channel_sales = sales_df.groupBy("SalesChannel") \
+                        .agg(sum("TotalSales").alias("TotalSales")) \
+                        .orderBy("TotalSales", ascending=False)
+
+channel_pd = channel_sales.toPandas()
+
+plt.figure(figsize=(8,8))
+plt.pie(channel_pd["TotalSales"], labels=channel_pd["SalesChannel"], 
+        autopct='%1.1f%%', colors=['gold', 'lightcoral', 'lightskyblue'])
+plt.title("Sales Distribution by Channel")
+plt.show()
+
+## 3. Line Chart - Monthly Sales Trend
+monthly_sales = sales_df.withColumn("MonthYear", date_format(col("OrderDate"), "yyyy-MM")) \
+                        .groupBy("MonthYear") \
+                        .agg(sum("TotalSales").alias("TotalSales")) \
+                        .orderBy("MonthYear")
+
+monthly_pd = monthly_sales.toPandas()
+
+plt.figure(figsize=(12,6))
+plt.plot(monthly_pd["MonthYear"], monthly_pd["TotalSales"], marker='o', color='green')
+plt.title("Monthly Sales Trend")
+plt.xlabel("Month")
+plt.ylabel("Total Sales ($)")
+plt.xticks(rotation=45)
+plt.grid(True)
+plt.show()
+
+## 4. Box Plot - Sales Distribution by Region
+region_sales = sales_df.select("Region", "TotalSales").toPandas()
+
+plt.figure(figsize=(10,6))
+sns.boxplot(data=region_sales, x="Region", y="TotalSales", palette="Set2")
+plt.title("Sales Distribution by Region")
+plt.xlabel("Region")
+plt.ylabel("Total Sales ($)")
+plt.show()
+
+## 5. Scatter Plot - Unit Price vs. Units Sold
+scatter_data = sales_df.select("UnitPrice", "UnitsSold").toPandas()
+
+plt.figure(figsize=(10,6))
+plt.scatter(scatter_data["UnitPrice"], scatter_data["UnitsSold"], alpha=0.6)
+plt.title("Unit Price vs. Units Sold")
+plt.xlabel("Unit Price ($)")
+plt.ylabel("Units Sold")
+plt.grid(True)
+plt.show()
+
+## 6. Histogram - Customer Age Distribution
+age_data = sales_df.select("CustomerAge").toPandas()
+
+plt.figure(figsize=(10,6))
+plt.hist(age_data["CustomerAge"], bins=10, color='purple', edgecolor='black')
+plt.title("Customer Age Distribution")
+plt.xlabel("Age")
+plt.ylabel("Number of Customers")
+plt.show()
