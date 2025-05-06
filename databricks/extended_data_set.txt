@@ -1,0 +1,51 @@
+###################
+Create Customer Demographics Dataset
+#########################
+
+from pyspark.sql import SparkSession
+from pyspark.sql.types import *
+import random
+from datetime import datetime
+
+spark = SparkSession.builder.appName("CustomerData").getOrCreate()
+
+# Customer demographics data
+customer_data = []
+customer_ids = [f"CUST{1000 + i}" for i in range(25)]
+membership_levels = ['Basic', 'Silver', 'Gold', 'Platinum']
+cities = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix']
+genders = ['Male', 'Female', 'Other']
+
+for i in range(25):
+    join_date = datetime(2022, 1, 1) + timedelta(days=random.randint(1, 730))
+    customer_data.append({
+        'CustomerID': customer_ids[i],
+        'OrderID': f'ORD{1000 + i}',  # Matching order IDs from sales data
+        'Name': f'Customer {i+1}',
+        'Age': random.randint(18, 70),
+        'Gender': random.choice(genders),
+        'City': random.choice(cities),
+        'MembershipLevel': random.choices(membership_levels, weights=[0.4, 0.3, 0.2, 0.1])[0],
+        'JoinDate': join_date,
+        'LoyaltyPoints': random.randint(0, 5000),
+        'Email': f'customer{i+1}@example.com'
+    })
+
+# Schema for customer data
+customer_schema = StructType([
+    StructField("CustomerID", StringType(), True),
+    StructField("OrderID", StringType(), True),
+    StructField("Name", StringType(), True),
+    StructField("Age", IntegerType(), True),
+    StructField("Gender", StringType(), True),
+    StructField("City", StringType(), True),
+    StructField("MembershipLevel", StringType(), True),
+    StructField("JoinDate", DateType(), True),
+    StructField("LoyaltyPoints", IntegerType(), True),
+    StructField("Email", StringType(), True)
+])
+
+customers_df = spark.createDataFrame(customer_data, customer_schema)
+customers_df.createOrReplaceTempView("customers")
+
+display(customers_df)
