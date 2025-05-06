@@ -111,3 +111,19 @@ customer_segments = spark.sql("""
 """)
 
 display(customer_segments)
+
+#Product Preferences by Demographic
+product_preferences = spark.sql("""
+    SELECT 
+        s.ProductCategory,
+        c.MembershipLevel,
+        c.Gender,
+        COUNT(s.OrderID) AS OrderCount,
+        ROUND(SUM(s.TotalSales), 2) AS TotalSales
+    FROM sales_data s
+    JOIN customers c ON s.OrderID = c.OrderID
+    GROUP BY s.ProductCategory, c.MembershipLevel, c.Gender
+    ORDER BY s.ProductCategory, TotalSales DESC
+""")
+
+display(product_preferences)
