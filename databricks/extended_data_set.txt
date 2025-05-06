@@ -57,6 +57,34 @@ combined_df = sales_df.join(
     "inner"
 )
 
+#Left Join (Keep All Sales)
+left_combined = sales_df.join(
+    customers_df,
+    sales_df.OrderID == customers_df.OrderID,
+    "left"
+)
+
+left_combined.createOrReplaceTempView("all_sales_with_customer_info")
+
+
+#Query Examples on Merged Data
+#Sales Performance by Membership Level
+
+membership_sales = spark.sql("""
+    SELECT 
+        c.MembershipLevel,
+        COUNT(s.OrderID) AS OrderCount,
+        ROUND(SUM(s.TotalSales), 2) AS TotalSales,
+        ROUND(AVG(s.TotalSales), 2) AS AvgOrderValue,
+        ROUND(SUM(s.TotalSales) * 100 / (SELECT SUM(TotalSales) FROM sales_data), 2) AS SalesPercentage
+    FROM sales_data s
+    JOIN customers c ON s.OrderID = c.OrderID
+    GROUP BY c.MembershipLevel
+    ORDER BY TotalSales DESC
+""")
+
+display(membership_sales)
+
 # Create a temporary view
 combined_df.createOrReplaceTempView("sales_with_customers")
 
