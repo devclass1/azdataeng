@@ -90,3 +90,24 @@ combined_df.createOrReplaceTempView("sales_with_customers")
 
 # Show the combined schema
 combined_df.printSchema()
+
+#Customer Segmentation Analysis
+customer_segments = spark.sql("""
+    SELECT 
+        CASE 
+            WHEN c.Age < 30 THEN 'Under 30'
+            WHEN c.Age BETWEEN 30 AND 50 THEN '30-50'
+            ELSE 'Over 50'
+        END AS AgeGroup,
+        c.Gender,
+        c.City,
+        COUNT(DISTINCT c.CustomerID) AS CustomerCount,
+        ROUND(SUM(s.TotalSales), 2) AS TotalSales,
+        ROUND(AVG(s.TotalSales), 2) AS AvgSpend
+    FROM sales_data s
+    JOIN customers c ON s.OrderID = c.OrderID
+    GROUP BY AgeGroup, c.Gender, c.City
+    ORDER BY TotalSales DESC
+""")
+
+display(customer_segments)
