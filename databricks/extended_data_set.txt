@@ -49,3 +49,16 @@ customers_df = spark.createDataFrame(customer_data, customer_schema)
 customers_df.createOrReplaceTempView("customers")
 
 display(customers_df)
+
+# Merge sales data with customer data
+combined_df = sales_df.join(
+    customers_df, 
+    sales_df.OrderID == customers_df.OrderID, 
+    "inner"
+)
+
+# Create a temporary view
+combined_df.createOrReplaceTempView("sales_with_customers")
+
+# Show the combined schema
+combined_df.printSchema()
