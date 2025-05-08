@@ -1,0 +1,22 @@
+from pyspark.sql import SparkSession
+
+# Create Spark session with Delta Lake configuration
+spark = SparkSession.builder \
+    .appName("AzureBlobDeltaAccess") \
+    .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
+    .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog") \
+    .getOrCreate()
+
+# Azure Blob Storage configuration
+storage_account_name = "datalake5634"
+container_name = "data"  # Adjust if different
+file_path = "Log.csv"    # Adjust if different
+
+#Read via direct HTTPS with anonymous access (if available)
+try:
+    print("Attempting Method 1: Direct HTTPS access...")
+    delta_path = f"https://{storage_account_name}.blob.core.windows.net/{container_name}/{file_path}"
+    df = spark.read.format("delta").load(delta_path)
+    print("Success with Method 1: Direct HTTPS access")
+except Exception as e:
+    print(f"Method 1 failed: {str(e)}")
