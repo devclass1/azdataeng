@@ -20,3 +20,19 @@ try:
     print("Success with Method 1: Direct HTTPS access")
 except Exception as e:
     print(f"Method 1 failed: {str(e)}")
+
+# If method succeeded, display the data
+if 'df' in locals():
+    print("\nData loaded successfully. Displaying information:")
+    
+    # Show basic info
+    print(f"Number of partitions: {df.rdd.getNumPartitions()}")
+    print(f"Total records: {df.count()}")
+    
+    # Display schema
+    print("\nSchema:")
+    df.printSchema()
+    
+    # Show sample data
+    print("\nSample data (first 5 rows):")
+    display(df.limit(5))
