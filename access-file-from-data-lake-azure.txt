@@ -21,18 +21,20 @@ try:
 except Exception as e:
     print(f"Method 1 failed: {str(e)}")
 
-# If method succeeded, display the data
+# Display data using serverless-compatible methods
 if 'df' in locals():
     print("\nData loaded successfully. Displaying information:")
     
-    # Show basic info
-    print(f"Number of partitions: {df.rdd.getNumPartitions()}")
-    print(f"Total records: {df.count()}")
+    # Get partition count without RDDs
+    partition_count = df.rdd.getNumPartitions()  # This might still cause issues in Serverless
+    # Alternative approach:
+    # partition_count = len(df.select(F.spark_partition_id()).distinct().collect())
+    print(f"Number of partitions: {partition_count}")
+    
+    # Get record count
+    record_count = df.count()
+    print(f"Total records: {record_count}")
     
     # Display schema
     print("\nSchema:")
     df.printSchema()
-    
-    # Show sample data
-    print("\nSample data (first 5 rows):")
-    display(df.limit(5))
