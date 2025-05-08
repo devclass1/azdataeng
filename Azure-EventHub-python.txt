@@ -1,0 +1,11 @@
+Capture Event Hubs data in Azure Storage and read it by using Python Application
+###################################################################################
+
+Create an Azure Blob storage account and container in the Azure portal.
+Create an Event Hubs namespace by using the Azure portal.
+Create an event hub with the Capture feature enabled and connect it to your storage account.
+Send data to your event hub by using a Python script.
+Read and process files from Event Hubs Capture by using another Python script.
+
+###################################################################################
+
